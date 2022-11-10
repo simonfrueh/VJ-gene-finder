@@ -31,7 +31,7 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
 	seq_data_rc = seq_data.reverse_complement()
 
 	# prepare total number of tasks and result list
-	tasks = 5
+	tasks = 8
 	task_i = 0
 	result_list = []
 	
@@ -65,6 +65,23 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
 	print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
 	      + " two-exon leader peptide in reverse complement (RC)")
 	mV.task_V2(seq_data_rc, rss_rc, "RC", result_list)
+	
+	# identify J search candidates by RSS motif GTG
+	task_i+= 1
+	print("(%i/%i)" % (task_i, tasks) + " identify J search candidates"
+	    + " by RSS motif GTG")
+	rss, rss_rc = mJ.ident_J_rss_motif(seq_data, seq_data_rc)
+
+	# J segments
+	task_i+= 1
+	print("(%i/%i)" % (task_i, tasks) + " search for J segments")
+	mJ.task_J(seq_data, rss, "", result_list)
+	
+	# J segments (RC)
+	task_i+= 1
+	print("(%i/%i)" % (task_i, tasks) + " search for J in reverse"
+	      + " complement (RC)")
+	mJ.task_J(seq_data_rc, rss_rc, "RC", result_list)
 	
 	# Results	
 	mR.show_results(result_list)

@@ -16,12 +16,12 @@ def check_V1_motif_criteria(omega_aa):
 		len(omega_aa) >= 161):
 			return False
 	
-	# z1 = Cys/C between 32 - 82 (Ωaa )
+	# z1 = Cys/C between 32 - 82 (Ωaa)
 	count_C = omega_aa[32-1:82].count("C")
 	if count_C == 0:
 		return False
 	
-	# z2 = Trp/W between 44 - 97 (Ωaa )
+	# z2 = Trp/W between 44 - 97 (Ωaa)
 	count_W = omega_aa[44-1:97].count("W")
 	if count_W == 0:
 		return False
@@ -175,7 +175,7 @@ def search_V2_motif(seq, p1, p2, offset, rc, result_list):
 	
 	candidates = []	
 	codon = "AG"
-	for s in range(p1, p2-(len(codon)-1)):	
+	for s in range(p1, p2-(len(codon)+1)):	
 		if seq[s:s+len(codon)] == codon:
 			candidates.append(s)
 	
