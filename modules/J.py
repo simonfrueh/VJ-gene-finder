@@ -144,6 +144,28 @@ def search_J_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
 	return 0
 
 
+# identify search candidates by RSS motif CAC
+# seq: Bio.Seq DNA sequence
+# seq_rc: Bio.Seq DNA sequence (reverse complement)
+def ident_J_rss_motif(seq, seq_rc):
+
+	# identify search candidates by RSS motif GTG
+	instances = [Seq("GTG")]
+	m = motifs.create(instances)
+
+	rss = []
+	for r in m.instances.search(seq):
+		# pointer at 3' end of RSS motif
+		rss.append(r[0] + len("GTG"))
+
+	rss_rc = []
+	for r in m.instances.search(seq_rc):
+		# pointer at 3' end of RSS motif
+		rss_rc.append(r[0] + len("GTG"))
+		
+	return rss, rss_rc
+
+
 # J
 # seq: Bio.Seq DNA sequence
 # rss: index list of search candidates identified by RSS motif
@@ -172,26 +194,5 @@ def task_J(seq, rss, rc, result_list):
 			# define search region
 			p1 = r
 			p2 = r + 78
-			min_next_r = search_J_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list)
-                           
-
-# identify search candidates by RSS motif CAC
-# seq: Bio.Seq DNA sequence
-# seq_rc: Bio.Seq DNA sequence (reverse complement)
-def ident_J_rss_motif(seq, seq_rc):
-
-	# identify search candidates by RSS motif GTG
-	instances = [Seq("GTG")]
-	m = motifs.create(instances)
-
-	rss = []
-	for r in m.instances.search(seq):
-		# pointer at 3' end of RSS motif
-		rss.append(r[0] + len("GTG"))
-
-	rss_rc = []
-	for r in m.instances.search(seq_rc):
-		# pointer at 3' end of RSS motif
-		rss_rc.append(r[0] + len("GTG"))
-		
-	return rss, rss_rc
+			min_next_r = search_J_motif(seq, p1, p2, rc, codon_list, 
+			                            z1, z2, result_list)
