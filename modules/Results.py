@@ -10,7 +10,7 @@ def show_results(result_list):
 	print("\nResults\n%i result(s) found" % len(result_list))
 	
 	if len(result_list) > 0:
-		print("legend: [omega_nn, omega_aa, seq_rssi+39, TRgroup" 
+		print("legend: [omega_nn, omega_aa, seq_rssi, TRgroup" 
 			  +", RC, s, p1, p2]")
 		for n in result_list:
 			print(n)
