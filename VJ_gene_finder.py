@@ -7,13 +7,13 @@
 from Bio.Seq import Seq
 from Bio import SeqIO
 
-import modules.Init as mI
-import modules.V as mV
-import modules.J as mJ
-import modules.Results as mR
+import modules.init as i
+import modules.v as v
+import modules.j as j
+import modules.results as r
 
 # Parse and process command line arguments
-path, filename = mI.parse_arguments()
+path, filename = i.parse_arguments()
 
 # Loop through input records
 n_seq_record = 0
@@ -38,52 +38,52 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify V search candidates"
           + " by RSS motif CAC")
-    rss, rss_rc = mV.ident_V_rss_motif(seq_data, seq_data_rc)
+    rss, rss_rc = v.ident_V_rss_motif(seq_data, seq_data_rc)
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " single-exon leader peptide (TRAV1 and TRGV1)")
-    mV.task_V1(seq_data, rss, "", result_list)
+    v.task_V1(seq_data, rss, "", result_list)
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " single-exon leader peptide (TRAV1 and TRGV1) in reverse"
           + " complement (RC)")
-    mV.task_V1(seq_data_rc, rss_rc, "RC", result_list)
+    v.task_V1(seq_data_rc, rss_rc, "RC", result_list)
 
     # Search V segments with two-exon leader peptide (all others)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " two-exon leader peptide")
-    mV.task_V2(seq_data, rss, "", result_list)
+    v.task_V2(seq_data, rss, "", result_list)
 
     # Search V segments with two-exon leader peptide (all others) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " two-exon leader peptide in reverse complement (RC)")
-    mV.task_V2(seq_data_rc, rss_rc, "RC", result_list)
+    v.task_V2(seq_data_rc, rss_rc, "RC", result_list)
 
     # Identify J search candidates by RSS motif GTG
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify J search candidates"
           + " by RSS motif GTG")
-    rss, rss_rc = mJ.ident_J_rss_motif(seq_data, seq_data_rc)
+    rss, rss_rc = j.ident_J_rss_motif(seq_data, seq_data_rc)
 
     # Search J segments
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J segments")
-    mJ.task_J(seq_data, rss, "", result_list)
+    j.task_J(seq_data, rss, "", result_list)
 
     # Search J segments (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J in reverse"
           + " complement (RC)")
-    mJ.task_J(seq_data_rc, rss_rc, "RC", result_list)
+    j.task_J(seq_data_rc, rss_rc, "RC", result_list)
 
     # Show results and write result files
-    mR.show_results(result_list)
-    mR.write_results(path, seq_record.id, result_list)
+    r.show_results(result_list)
+    r.write_results(path, seq_record.id, result_list)
 
     print("...finished\n")

@@ -1,7 +1,7 @@
 from Bio.Seq import Seq
 from Bio import motifs
 
-import modules.Functions as mF
+import modules.functions as f
 
 
 # Check motif criteria for J gene
@@ -105,15 +105,15 @@ def task_J(seq, rss, rc, result_list):
 
     # Resolve wobble bases at highest task level to save time in loops
     codon_list = ["GTRDGD"]
-    mF.list_resolve_wobble_bases(codon_list)
+    f.list_resolve_wobble_bases(codon_list)
 
     # Resolve wobble bases at highest task level to save time in loops
     z1 = ["TTNGGNNNNGG"]
-    mF.list_resolve_wobble_bases(z1)
+    f.list_resolve_wobble_bases(z1)
 
     # Resolve wobble bases at highest task level to save time in loops
     z2 = ["TNNNNNT"]
-    mF.list_resolve_wobble_bases(z2)
+    f.list_resolve_wobble_bases(z2)
 
     for r in rss:
         # Obey maximum r and perform search
