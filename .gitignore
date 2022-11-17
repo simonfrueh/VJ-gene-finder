@@ -1,6 +1,6 @@
  # ignore ALL .log files
 *.log
 
-# ignore ALL files in ANY directory named temp
+# ignore ALL files in ANY directory with the following names
 __pycache__
 Archiv
