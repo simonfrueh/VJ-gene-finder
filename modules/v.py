@@ -4,7 +4,7 @@ from Bio import motifs
 
 # Check motif criteria for V gene part 1
 # omega_aa: translated amino acid sequence of search region
-def check_V1_motif_criteria(omega_aa):
+def check_v1_motif_criteria(omega_aa):
     # omega_nn does not contain a stop codon TAA, TAG or TGA
     # or omega_aa does not contain *
     if omega_aa.count("*") > 0:
@@ -41,7 +41,7 @@ def check_V1_motif_criteria(omega_aa):
 
 # Check motif criteria for V gene part 2
 # omega_aa: translated amino acid sequence of search region
-def check_V2_motif_criteria(omega_aa):
+def check_v2_motif_criteria(omega_aa):
     # omega_nn does not contain a stop codon TAA, TAG or TGA
     # or omega_aa does not contain *
     if omega_aa.count("*") > 0:
@@ -114,7 +114,7 @@ def overlaps_with_prev_result(s, p2, rc_type, result_list):
 # offset: offset after start codon
 # rc: "RC" / "" means reverse complement or not
 # result_list: list to append results
-def search_V1_motif(seq, p1, p2, offset, rc, result_list):
+def search_v1_motif(seq, p1, p2, offset, rc, result_list):
     candidates = []
     codon = "ATG"
 
@@ -131,7 +131,7 @@ def search_V1_motif(seq, p1, p2, offset, rc, result_list):
         # Translate with NCBI standard table
         omega_aa = omega_nn.translate(table=1)
 
-        if check_V1_motif_criteria(omega_aa) is False:
+        if check_v1_motif_criteria(omega_aa) is False:
             continue
         else:
             tr_list = [
@@ -168,7 +168,7 @@ def search_V1_motif(seq, p1, p2, offset, rc, result_list):
 # offset: offset after start codon
 # rc: "RC" / "" means reverse complement or not
 # result_list: list to append results
-def search_V2_motif(seq, p1, p2, offset, rc, result_list):
+def search_v2_motif(seq, p1, p2, offset, rc, result_list):
     candidates = []
     codon = "AG"
 
@@ -190,7 +190,7 @@ def search_V2_motif(seq, p1, p2, offset, rc, result_list):
         # Translate with NCBI standard table
         omega_aa = omega_nn.translate(table=1)
 
-        if check_V2_motif_criteria(omega_aa) is False:
+        if check_v2_motif_criteria(omega_aa) is False:
             continue
         else:
             tr_list = [
@@ -229,7 +229,7 @@ def search_V2_motif(seq, p1, p2, offset, rc, result_list):
 # Identify search candidates by RSS motif CAC and return position
 # seq: Bio.Seq DNA sequence
 # seq_rc: Bio.Seq DNA sequence (reverse complement)
-def ident_V_rss_motif(seq, seq_rc):
+def ident_v_rss_motif(seq, seq_rc):
     # Identify search candidates by RSS motif CAC
     instances = [Seq("CAC")]
     m = motifs.create(instances)
@@ -252,7 +252,7 @@ def ident_V_rss_motif(seq, seq_rc):
 # rss: index list of search candidates identified by RSS motif
 # rc: "RC" / "" is reverse complement or not
 # result_list: list to append results
-def task_V1(seq, rss, rc, result_list):
+def task_v1(seq, rss, rc, result_list):
     min_next_r = 0
 
     for r in rss:
@@ -262,7 +262,7 @@ def task_V1(seq, rss, rc, result_list):
             # RSS motif 5'-CAC-3' is cut off at 5'-end
             p1 = r - 483
             p2 = r
-            min_next_r = search_V1_motif(seq, p1, p2, 0, rc, result_list)
+            min_next_r = search_v1_motif(seq, p1, p2, 0, rc, result_list)
 
 
 # V gene V2: V segments with two-exon leader peptide (all others)
@@ -270,7 +270,7 @@ def task_V1(seq, rss, rc, result_list):
 # rss: index list of search candidates identified by RSS motif
 # rc: "RC" / "" is reverse complement or not
 # result_list: list to append results
-def task_V2(seq, rss, rc, result_list):
+def task_v2(seq, rss, rc, result_list):
     min_next_r = 0
 
     for r in rss:
@@ -280,4 +280,4 @@ def task_V2(seq, rss, rc, result_list):
             # RSS motif 5'-CAC-3' is cut off at 5'-end
             p1 = r - 345
             p2 = r
-            min_next_r = search_V2_motif(seq, p1, p2, 4, rc, result_list)
+            min_next_r = search_v2_motif(seq, p1, p2, 4, rc, result_list)

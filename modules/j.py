@@ -6,7 +6,7 @@ import modules.functions as f
 
 # Check motif criteria for J gene
 # omega_aa: translated amino acid sequence of search region
-def check_J_motif_criteria(omega_nn, z1, z2):
+def check_j_motif_criteria(omega_nn, z1, z2):
     # omega_nn does not contain a stop codon TAA, TAG or TGA
     if (omega_nn.count("TAA") > 0 or omega_nn.count("TAG")
             or omega_nn.count("TGA")):
@@ -42,7 +42,7 @@ def check_J_motif_criteria(omega_nn, z1, z2):
 # z1: list of base sequences for z1 motiv criterion
 # z2: list of base sequences for z2 motiv criterion
 # result_list: list to append results
-def search_J_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
+def search_j_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
     candidates = []
     for s in range(p1+44, p2-(len(codon_list[0])+1)):
         if codon_list.count(seq[s:s+len(codon_list[0])]) > 0:
@@ -51,7 +51,7 @@ def search_J_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
     for s in candidates:
         omega_nn = seq[p1:s]
 
-        if check_J_motif_criteria(omega_nn, z1, z2) is False:
+        if check_j_motif_criteria(omega_nn, z1, z2) is False:
             continue
         else:
             result_list.append([
@@ -77,7 +77,7 @@ def search_J_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
 # Identify search candidates by RSS motif CAC and return position
 # seq: Bio.Seq DNA sequence
 # seq_rc: Bio.Seq DNA sequence (reverse complement)
-def ident_J_rss_motif(seq, seq_rc):
+def ident_j_rss_motif(seq, seq_rc):
     # Identify search candidates by RSS motif GTG
     instances = [Seq("GTG")]
     m = motifs.create(instances)
@@ -100,7 +100,7 @@ def ident_J_rss_motif(seq, seq_rc):
 # rss: index list of search candidates identified by RSS motif
 # rc: "RC" / "" is reverse complement or not
 # result_list: list to append results
-def task_J(seq, rss, rc, result_list):
+def task_j(seq, rss, rc, result_list):
     min_next_r = 0
 
     # Resolve wobble bases at highest task level to save time in loops
@@ -121,5 +121,5 @@ def task_J(seq, rss, rc, result_list):
             # Define search region
             p1 = r
             p2 = r + 78
-            min_next_r = search_J_motif(
+            min_next_r = search_j_motif(
                 seq, p1, p2, rc, codon_list, z1, z2, result_list)

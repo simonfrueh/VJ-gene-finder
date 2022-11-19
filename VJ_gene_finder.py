@@ -38,49 +38,49 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify V search candidates"
           + " by RSS motif CAC")
-    rss, rss_rc = v.ident_V_rss_motif(seq_data, seq_data_rc)
+    rss, rss_rc = v.ident_v_rss_motif(seq_data, seq_data_rc)
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " single-exon leader peptide (TRAV1 and TRGV1)")
-    v.task_V1(seq_data, rss, "", result_list)
+    v.task_v1(seq_data, rss, "", result_list)
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " single-exon leader peptide (TRAV1 and TRGV1) in reverse"
           + " complement (RC)")
-    v.task_V1(seq_data_rc, rss_rc, "RC", result_list)
+    v.task_v1(seq_data_rc, rss_rc, "RC", result_list)
 
     # Search V segments with two-exon leader peptide (all others)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " two-exon leader peptide")
-    v.task_V2(seq_data, rss, "", result_list)
+    v.task_v2(seq_data, rss, "", result_list)
 
     # Search V segments with two-exon leader peptide (all others) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " two-exon leader peptide in reverse complement (RC)")
-    v.task_V2(seq_data_rc, rss_rc, "RC", result_list)
+    v.task_v2(seq_data_rc, rss_rc, "RC", result_list)
 
     # Identify J search candidates by RSS motif GTG
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify J search candidates"
           + " by RSS motif GTG")
-    rss, rss_rc = j.ident_J_rss_motif(seq_data, seq_data_rc)
+    rss, rss_rc = j.ident_j_rss_motif(seq_data, seq_data_rc)
 
     # Search J segments
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J segments")
-    j.task_J(seq_data, rss, "", result_list)
+    j.task_j(seq_data, rss, "", result_list)
 
     # Search J segments (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J in reverse"
           + " complement (RC)")
-    j.task_J(seq_data_rc, rss_rc, "RC", result_list)
+    j.task_j(seq_data_rc, rss_rc, "RC", result_list)
 
     # Show results and write result files
     r.show_results(result_list)
