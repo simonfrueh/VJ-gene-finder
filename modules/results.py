@@ -36,18 +36,14 @@ def write_results(output_dir, sec_record_id, result_list):
 
     for r in result_list:
         # Fasta header variables for V genes
-        if r[8] == "V2":
-            # s = r[5] = s1+4 --> V2: start = s1+2 = s-2
-            start = r[5] - 2
-            end = r[7]
-        elif r[8] == "V1":
-            # V1: start = s1 = s
-            start = r[5]
-            end = r[7]
+        # add +1 for each position as python starts with 0
+        if r[8] == "V1" or r[8] == "V2":
+            start = r[5] + 1
+            end = r[7] + 1
         # Fasta header variables for J genes
         elif r[8] == "J":
-            start = r[6]
-            end = r[5]
+            start = r[6] + 1
+            end = r[5] + 1
         header = (r[3] + "-" + str(start) + "*01|" + sec_record_id
                   + "|F|" + str(start) + "-" + str(end) + "|")
         if r[4] == "RC":

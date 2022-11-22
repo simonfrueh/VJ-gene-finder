@@ -6,10 +6,25 @@ import modules.functions as f
 
 # Check motif criteria for J gene
 # omega_aa: translated amino acid sequence of search region
-def check_j_motif_criteria(omega_nn, z1, z2):
+def check_j_motif_criteria(omega_nn, omega_aa_1, omega_aa_2, omega_aa_3, z1, 
+                           z2):
     # omega_nn does not contain a stop codon TAA, TAG or TGA
-    if (omega_nn.count("TAA") > 0 or omega_nn.count("TAG")
-            or omega_nn.count("TGA")):
+    #if (omega_nn.count("TAA") > 0 or omega_nn.count("TAG")
+    #        or omega_nn.count("TGA")):
+    #    return False
+    
+    # To Do: 
+    # - FGXG (X = beliebige Aminosäure)
+    # - Warning: multiple of three
+    omega_aa = Seq("")
+    if omega_aa_1.count("FG") > 0:
+        omega_aa = omega_aa_1
+    if omega_aa_2.count("FG") > 0:
+        omega_aa = omega_aa_2
+    if omega_aa_3.count("FG") > 0:
+        omega_aa = omega_aa_3
+        
+    if omega_aa.count("*") > 0:
         return False
 
     # Length Ωnn > 42 and < 71
@@ -50,19 +65,34 @@ def search_j_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
 
     for s in candidates:
         omega_nn = seq[p1:s]
+        
+        # Translate with NCBI standard table
+        omega_aa_1 = omega_nn.translate(table=1)
+        omega_aa_2 = omega_nn[1:].translate(table=1)
+        omega_aa_3 = omega_nn[2:].translate(table=1)
 
-        if check_j_motif_criteria(omega_nn, z1, z2) is False:
+        if check_j_motif_criteria(omega_nn, omega_aa_1, omega_aa_2, omega_aa_3,
+                                  z1, z2) is False:
             continue
         else:
+            if rc == "RC":
+                s_temp = len(seq) - 1 - (s - 1)
+                p1_temp = len(seq) - 1 - p1
+                p2_temp = len(seq) - 1 - p2
+            else:
+                s_temp = s - 1
+                p1_temp = p1
+                p2_temp = p2
+                
             result_list.append([
                 omega_nn,
                 "",
                 seq[p1-28:p1],
                 "TRJ",
                 rc,
-                s,
-                p1,
-                p2,
+                s_temp,
+                p1_temp,
+                p2_temp,
                 "J"
                 ])
 
@@ -108,11 +138,11 @@ def task_j(seq, rss, rc, result_list):
     f.list_resolve_wobble_bases(codon_list)
 
     # Resolve wobble bases at highest task level to save time in loops
-    z1 = ["TTNGGNNNNGG"]
+    z1 = ["TTYGGNNNNGG"]
     f.list_resolve_wobble_bases(z1)
 
     # Resolve wobble bases at highest task level to save time in loops
-    z2 = ["TNNNNNT"]
+    z2 = ["TNNBNRT"]
     f.list_resolve_wobble_bases(z2)
 
     for r in rss:
