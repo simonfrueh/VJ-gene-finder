@@ -12,22 +12,29 @@ def parse_arguments():
         epilog="https://github.com/simonfrueh/VJ-gene-finder")
 
     # Add and parse arguments
-    # To Do:
-    # - option for output directory
-    # - option for version information
     parser.add_argument("filename", help="Input file")
+    parser.add_argument("-v", "--version", action="version",
+                        version="%(prog)s 0.99")
+    parser.add_argument("-o", "--output", help="Output directory")
     args = parser.parse_args()
 
-    if args.filename:
-        print("Input file: %s" % args.filename)
-
-    path = os.path.dirname(args.filename).replace(" ", "")
+    # Process Input filename (mandatory)
+    print("Input file: %s" % args.filename)
+    path = os.path.dirname(args.filename)
 
     # Add trailing slash for later usage
     if len(path) > 0:
         if path[-1] != "/":
             path += "/"
-
     filename = os.path.basename(args.filename)
 
-    return path, filename
+    output_dir = path + "output/"
+    if args.output:
+        output_dir = args.output
+        print("Output directory: %s" % output_dir)
+
+    # Add trailing slash for later usage
+    if output_dir[-1] != "/":
+        output_dir += "/"
+
+    return path, filename, output_dir

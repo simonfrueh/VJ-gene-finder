@@ -13,7 +13,7 @@ import modules.j as j
 import modules.results as r
 
 # Parse and process command line arguments
-path, filename = i.parse_arguments()
+path, filename, output_dir = i.parse_arguments()
 
 # Loop through input records
 n_seq_record = 0
@@ -84,6 +84,6 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
 
     # Show results and write result files
     r.show_results(result_list)
-    r.write_results(path, seq_record.id, result_list)
+    r.write_results(output_dir, seq_record.id, result_list)
 
     print("...finished\n")

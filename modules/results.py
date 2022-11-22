@@ -17,19 +17,18 @@ def show_results(result_list):
 
 
 # Write results to output directory, directory will be created/overwritten
-# path: path for output directory
+# output_dir: output directory
 # sec_record_id: sec_record.id for filename/header of fasta result files
 # result_list: list of all results to write
-def write_results(path, sec_record_id, result_list):
+def write_results(output_dir, sec_record_id, result_list):
     if len(result_list) == 0:
         return
 
-    print("\nWriting result files to output-directory")
+    print("\nWriting result files to output directory")
 
     # Make sure output directory exists
-    output_path = path + "output/"
-    if not os.path.exists(output_path):
-        os.mkdir(output_path)
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
 
     records_nn = []
     records_rss = []
@@ -84,16 +83,16 @@ def write_results(path, sec_record_id, result_list):
         filename = (sec_record_id.replace("*", "_").replace("|", "_")
                     + ".fasta")
         print(filename)
-        SeqIO.write(records_nn, output_path + filename, "fasta")
+        SeqIO.write(records_nn, output_dir + filename, "fasta")
 
     if len(records_rss) > 0:
         filename = (sec_record_id.replace("*", "_").replace("|", "_")
                     + "_RSS" + ".fasta")
         print(filename)
-        SeqIO.write(records_rss, output_path + filename, "fasta")
+        SeqIO.write(records_rss, output_dir + filename, "fasta")
 
     if len(records_aa) > 0:
         filename = (sec_record_id.replace("*", "_").replace("|", "_")
                     + "_aa" + ".fasta")
         print(filename)
-        SeqIO.write(records_aa, output_path + filename, "fasta")
+        SeqIO.write(records_aa, output_dir + filename, "fasta")
