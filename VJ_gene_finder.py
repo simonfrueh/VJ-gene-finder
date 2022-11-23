@@ -8,8 +8,9 @@ from Bio.Seq import Seq
 from Bio import SeqIO
 
 import modules.init as i
-import modules.v as v
+import modules.functions as f
 import modules.j as j
+import modules.v as v
 import modules.results as r
 
 # Parse and process command line arguments
@@ -38,19 +39,19 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify V search candidates"
           + " by RSS motif CAC")
-    rss, rss_rc = v.ident_v_rss_motif(seq_data, seq_data_rc)
+    rss = f.ident_rss_motif(seq_data, "CAC")
+    rss_rc = f.ident_rss_motif(seq_data_rc, "CAC")
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
-          + " single-exon leader peptide (TRAV1 and TRGV1)")
+          + " single-exon leader peptide")
     v.task_v1(seq_data, rss, "", result_list)
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
-          + " single-exon leader peptide (TRAV1 and TRGV1) in reverse"
-          + " complement (RC)")
+          + " single-exon leader peptide in reverse complement (RC)")
     v.task_v1(seq_data_rc, rss_rc, "RC", result_list)
 
     # Search V segments with two-exon leader peptide (all others)
@@ -69,7 +70,8 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify J search candidates"
           + " by RSS motif GTG")
-    rss, rss_rc = j.ident_j_rss_motif(seq_data, seq_data_rc)
+    rss = f.ident_rss_motif(seq_data, "GTG")
+    rss_rc = f.ident_rss_motif(seq_data_rc, "GTG")
 
     # Search J segments
     task_i += 1

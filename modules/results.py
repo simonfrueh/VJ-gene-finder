@@ -36,7 +36,7 @@ def write_results(output_dir, sec_record_id, result_list):
 
     for r in result_list:
         # Fasta header variables for V genes
-        # add +1 for each position as python starts with 0
+        # add +1 to start/end position as python index starts at 0
         if r[8] == "V1" or r[8] == "V2":
             start = r[5] + 1
             end = r[7] + 1
@@ -66,7 +66,7 @@ def write_results(output_dir, sec_record_id, result_list):
         records_rss.append(rec)
 
         # Prepare record for fasta file (omega_aa)
-        # omega_nn could be empty for J genes
+        # check and skip if omega_aa is empty (possible for J genes)
         if r[1] != "":
             rec = SeqRecord(
                 Seq(r[1],),

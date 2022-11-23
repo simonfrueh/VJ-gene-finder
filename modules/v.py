@@ -1,5 +1,4 @@
 from Bio.Seq import Seq
-from Bio import motifs
 
 
 # Check motif criteria for V gene part 1
@@ -125,12 +124,11 @@ def search_v1_motif(seq, p1, p2, rc, result_list):
     for s in candidates:
 
         # Limit to multiple of three
-        #omega_nn = seq[s+offset:p2-(p2-(s+offset)) % 3]
         omega_nn = seq[s:p2]
 
-        # Translate with NCBI standard table
-        # To Do linebreak
-        omega_aa = omega_nn[0:len(omega_nn) - len(omega_nn) % 3].translate(table=1)
+        # Translate with NCBI standard table (limited to multiple of three)
+        translate_end = len(omega_nn) - len(omega_nn) % 3
+        omega_aa = omega_nn[0:translate_end].translate(table=1)
 
         if check_v1_motif_criteria(omega_aa) is False:
             continue
@@ -154,12 +152,14 @@ def search_v1_motif(seq, p1, p2, rc, result_list):
             if tr_group == "":
                 tr_group = "TRV-SEL"
 
-            # To Do: p2 in omega_nn nicht inkludiert, deshalb für Ausgaben p2 = p2-1
             if rc == "RC":
+                # convert reverse complement position to position on complement
+                # reduce p2 by one because p2 is not included in omega_nn
                 s_temp = len(seq) - 1 - s
                 p1_temp = len(seq) - 1 - p1
                 p2_temp = len(seq) - 1 - (p2 - 1)
             else:
+                # reduce p2 by one because p2 is not included in omega_nn
                 s_temp = s
                 p1_temp = p1
                 p2_temp = p2 - 1
@@ -200,15 +200,16 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
     # Reverse search to prioritize shorter result regions
     for s in reversed(candidates):
         # Check if omega_nn would overlap with previous result
-        if overlaps_with_prev_result(s + len(splice_site), p2, rc, result_list):
+        if overlaps_with_prev_result(s + len(splice_site), p2,
+                                     rc, result_list):
             continue
 
         # Limit to multiple of three (see p2_temp above)
         omega_nn = seq[s+len(splice_site):p2]
 
-        # Translate with NCBI standard table
-        omega_aa = omega_nn[2:len(omega_nn) - len(omega_nn) % 3].translate(table=1)
-        #omega_aa = omega_nn.translate(table=1)
+        # Translate with NCBI standard table (limited to multiple of three)
+        translate_end = len(omega_nn) - (len(omega_nn) - 2) % 3
+        omega_aa = omega_nn[2:translate_end].translate(table=1)
 
         if check_v2_motif_criteria(omega_aa) is False:
             continue
@@ -233,13 +234,16 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
                 tr_group = "TRV"
 
             if rc == "RC":
+                # convert reverse complement position to position on complement
+                # reduce p2 by one because p2 is not included in omega_nn
                 s_temp = len(seq) - 1 - (s + len(splice_site))
                 p1_temp = len(seq) - 1 - p1
-                p2_temp = len(seq) - 1 - (p2 -1)
+                p2_temp = len(seq) - 1 - (p2 - 1)
             else:
+                # reduce p2 by one because p2 is not included in omega_nn
                 s_temp = s + len(splice_site)
                 p1_temp = p1
-                p2_temp = p2 -1
+                p2_temp = p2 - 1
 
             result_list.append([
                 omega_nn,
@@ -259,27 +263,6 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
             return min_next_rss
 
     return 0
-
-
-# Identify search candidates by RSS motif CAC and return position
-# seq: Bio.Seq DNA sequence
-# seq_rc: Bio.Seq DNA sequence (reverse complement)
-def ident_v_rss_motif(seq, seq_rc):
-    # Identify search candidates by RSS motif CAC
-    instances = [Seq("CAC")]
-    m = motifs.create(instances)
-
-    rss = []
-    for r in m.instances.search(seq):
-        # Pointer at 5' end of RSS motif
-        rss.append(r[0])
-
-    rss_rc = []
-    for r in m.instances.search(seq_rc):
-        # Pointer at 5' end of RSS motif
-        rss_rc.append(r[0])
-
-    return rss, rss_rc
 
 
 # V gene V1: V segments with single-exon leader peptide (TRAV1 and TRGV1)

@@ -6,16 +6,10 @@ import modules.functions as f
 
 # Check motif criteria for J gene
 # omega_aa: translated amino acid sequence of search region
-def check_j_motif_criteria(omega_nn, omega_aa_1, omega_aa_2, omega_aa_3, z1, 
-                           z2):
-    # omega_nn does not contain a stop codon TAA, TAG or TGA
-    #if (omega_nn.count("TAA") > 0 or omega_nn.count("TAG")
-    #        or omega_nn.count("TGA")):
-    #    return False
-    
-    # To Do: 
-    # - FGXG (X = beliebige Aminosäure)
-    # - Warning: multiple of three
+def check_j_motif_criteria(omega_nn, omega_aa_1, omega_aa_2,
+                           omega_aa_3, z1, z2):
+    # To Do: FGXG (X = beliebige Aminosäure)
+    # Simon will das noch prüfen
     omega_aa = Seq("")
     if omega_aa_1.count("FG") > 0:
         omega_aa = omega_aa_1
@@ -23,7 +17,7 @@ def check_j_motif_criteria(omega_nn, omega_aa_1, omega_aa_2, omega_aa_3, z1,
         omega_aa = omega_aa_2
     if omega_aa_3.count("FG") > 0:
         omega_aa = omega_aa_3
-        
+
     if omega_aa.count("*") > 0:
         return False
 
@@ -65,25 +59,31 @@ def search_j_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
 
     for s in candidates:
         omega_nn = seq[p1:s]
-        
-        # Translate with NCBI standard table
-        omega_aa_1 = omega_nn.translate(table=1)
-        omega_aa_2 = omega_nn[1:].translate(table=1)
-        omega_aa_3 = omega_nn[2:].translate(table=1)
 
-        if check_j_motif_criteria(omega_nn, omega_aa_1, omega_aa_2, omega_aa_3,
-                                  z1, z2) is False:
+        # Translate with NCBI standard table (limited to multiple of three)
+        translate_end = len(omega_nn) - len(omega_nn) % 3
+        omega_aa_1 = omega_nn[0:translate_end].translate(table=1)
+        translate_end = len(omega_nn) - (len(omega_nn) - 1) % 3
+        omega_aa_2 = omega_nn[1:translate_end].translate(table=1)
+        translate_end = len(omega_nn) - (len(omega_nn) - 2) % 3
+        omega_aa_3 = omega_nn[2:translate_end].translate(table=1)
+
+        if check_j_motif_criteria(omega_nn, omega_aa_1, omega_aa_2,
+                                  omega_aa_3, z1, z2) is False:
             continue
         else:
             if rc == "RC":
+                # convert reverse complement position to position on complement
+                # reduce s by one because s is not included in omega_nn
                 s_temp = len(seq) - 1 - (s - 1)
                 p1_temp = len(seq) - 1 - p1
                 p2_temp = len(seq) - 1 - p2
             else:
+                # reduce s by one because s is not included in omega_nn
                 s_temp = s - 1
                 p1_temp = p1
                 p2_temp = p2
-                
+
             result_list.append([
                 omega_nn,
                 "",
@@ -102,27 +102,6 @@ def search_j_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
             return min_next_rss
 
     return 0
-
-
-# Identify search candidates by RSS motif CAC and return position
-# seq: Bio.Seq DNA sequence
-# seq_rc: Bio.Seq DNA sequence (reverse complement)
-def ident_j_rss_motif(seq, seq_rc):
-    # Identify search candidates by RSS motif GTG
-    instances = [Seq("GTG")]
-    m = motifs.create(instances)
-
-    rss = []
-    for r in m.instances.search(seq):
-        # Pointer at 3' end of RSS motif
-        rss.append(r[0] + len("GTG"))
-
-    rss_rc = []
-    for r in m.instances.search(seq_rc):
-        # Pointer at 3' end of RSS motif
-        rss_rc.append(r[0] + len("GTG"))
-
-    return rss, rss_rc
 
 
 # J gene
