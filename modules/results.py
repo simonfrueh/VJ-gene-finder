@@ -10,8 +10,8 @@ def show_results(result_list):
     print("\nResults\n%i result(s) found" % len(result_list))
 
     if len(result_list) > 0:
-        print("legend: [omega_nn, omega_aa, seq_rssi, TRgroup"
-              + ", RC, s, p1, p2]")
+        print("legend: [omega_nn, omega_aa, seq_rssi, TRgroup,"
+              + "RC, gene type, start, end, start_fasta, end_fasta]")
         for n in result_list:
             print(n)
 
@@ -35,17 +35,9 @@ def write_results(output_dir, sec_record_id, result_list):
     records_aa = []
 
     for r in result_list:
-        # Fasta header variables for V genes
-        # add +1 to start/end position as python index starts at 0
-        if r[8] == "V1" or r[8] == "V2":
-            start = r[5] + 1
-            end = r[7] + 1
-        # Fasta header variables for J genes
-        elif r[8] == "J":
-            start = r[6] + 1
-            end = r[5] + 1
-        header = (r[3] + "-" + str(start) + "*01|" + sec_record_id
-                  + "|F|" + str(start) + "-" + str(end) + "|")
+        # Determine fasta header
+        header = (r[3] + "-" + str(r[8]) + "*01|" + sec_record_id
+                  + "|F|" + str(r[8]) + "-" + str(r[9]) + "|")
         if r[4] == "RC":
             header += "RC|"
 
@@ -57,14 +49,6 @@ def write_results(output_dir, sec_record_id, result_list):
         )
         records_nn.append(rec)
 
-        # Prepare record for fasta file (rss_i to rss_i + 39)
-        rec = SeqRecord(
-            Seq(r[2],),
-            id="RSS-"+header,
-            description="",
-        )
-        records_rss.append(rec)
-
         # Prepare record for fasta file (omega_aa)
         # check and skip if omega_aa is empty (possible for J genes)
         if r[1] != "":
@@ -75,20 +59,31 @@ def write_results(output_dir, sec_record_id, result_list):
             )
             records_aa.append(rec)
 
+        # Prepare record for fasta file (rss)
+        # Use differen header for J genes
+        if r[5] == "J":
+            header = "TRJ-" + str(r[8]) + "*01|" + sec_record_id + "|"
+        rec = SeqRecord(
+            Seq(r[2],),
+            id="RSS-"+header,
+            description="",
+        )
+        records_rss.append(rec)
+
     if len(records_nn) > 0:
         filename = (sec_record_id.replace("*", "_").replace("|", "_")
                     + ".fasta")
         print(filename)
         SeqIO.write(records_nn, output_dir + filename, "fasta")
 
-    if len(records_rss) > 0:
-        filename = (sec_record_id.replace("*", "_").replace("|", "_")
-                    + "_RSS" + ".fasta")
-        print(filename)
-        SeqIO.write(records_rss, output_dir + filename, "fasta")
-
     if len(records_aa) > 0:
         filename = (sec_record_id.replace("*", "_").replace("|", "_")
                     + "_aa" + ".fasta")
         print(filename)
         SeqIO.write(records_aa, output_dir + filename, "fasta")
+
+    if len(records_rss) > 0:
+        filename = (sec_record_id.replace("*", "_").replace("|", "_")
+                    + "_RSS" + ".fasta")
+        print(filename)
+        SeqIO.write(records_rss, output_dir + filename, "fasta")

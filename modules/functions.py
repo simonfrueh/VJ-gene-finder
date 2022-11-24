@@ -2,10 +2,26 @@ from Bio.Seq import Seq
 from Bio import motifs
 
 
-# Identify search candidates by RSS motif and return position
+# Identify search candidates by RSS motif and return start position
 # seq: Bio.Seq DNA sequence
 # motif: RSS motif
-def ident_rss_motif(seq, motif):
+def ident_rss_motif_start_position(seq, motif):
+    # Identify search candidates by RSS motif
+    instances = [Seq(motif)]
+    m = motifs.create(instances)
+
+    search_candidates = []
+    for r in m.instances.search(seq):
+        # Pointer at 3' end of RSS motif
+        search_candidates.append(r[0])
+
+    return search_candidates
+
+
+# Identify search candidates by RSS motif and return end position
+# seq: Bio.Seq DNA sequence
+# motif: RSS motif
+def ident_rss_motif_end_position(seq, motif):
     # Identify search candidates by RSS motif
     instances = [Seq(motif)]
     m = motifs.create(instances)

@@ -39,8 +39,8 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify V search candidates"
           + " by RSS motif CAC")
-    rss = f.ident_rss_motif(seq_data, "CAC")
-    rss_rc = f.ident_rss_motif(seq_data_rc, "CAC")
+    rss = f.ident_rss_motif_start_position(seq_data, "CAC")
+    rss_rc = f.ident_rss_motif_start_position(seq_data_rc, "CAC")
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1)
     task_i += 1
@@ -70,8 +70,8 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify J search candidates"
           + " by RSS motif GTG")
-    rss = f.ident_rss_motif(seq_data, "GTG")
-    rss_rc = f.ident_rss_motif(seq_data_rc, "GTG")
+    rss = f.ident_rss_motif_end_position(seq_data, "GTG")
+    rss_rc = f.ident_rss_motif_end_position(seq_data_rc, "GTG")
 
     # Search J segments
     task_i += 1

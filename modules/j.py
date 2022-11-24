@@ -72,17 +72,20 @@ def search_j_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
                                   omega_aa_3, z1, z2) is False:
             continue
         else:
+            # start and end position (python index)
+            start = p1
+            end = s
+
+            # start and end postition (fasta index)
+            # Reduce end by one because end is not included in omega_nn
+            # Add one to start/end position as python index starts at 0
             if rc == "RC":
                 # convert reverse complement position to position on complement
-                # reduce s by one because s is not included in omega_nn
-                s_temp = len(seq) - 1 - (s - 1)
-                p1_temp = len(seq) - 1 - p1
-                p2_temp = len(seq) - 1 - p2
+                start_fasta = (len(seq) - 1 - p1) + 1
+                end_fasta = (len(seq) - 1 - (s - 1)) + 1
             else:
-                # reduce s by one because s is not included in omega_nn
-                s_temp = s - 1
-                p1_temp = p1
-                p2_temp = p2
+                start_fasta = p1 + 1
+                end_fasta = (s - 1) + 1
 
             result_list.append([
                 omega_nn,
@@ -90,10 +93,11 @@ def search_j_motif(seq, p1, p2, rc, codon_list, z1, z2, result_list):
                 seq[p1-28:p1],
                 "TRJ",
                 rc,
-                s_temp,
-                p1_temp,
-                p2_temp,
-                "J"
+                "J",
+                start,
+                end,
+                start_fasta,
+                end_fasta
                 ])
 
             # Skip GTRDGD and rssi between p1 and p3 + 6 nucleotides

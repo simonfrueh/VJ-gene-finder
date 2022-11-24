@@ -89,20 +89,24 @@ def assign_tr_group(omega_aa, n, tr_list):
     return tr_group.lstrip()
 
 
-# Check whether search region defined by s and p2 overlaps with
+# Check whether search region defined by start and end overlaps with
 # previous results from V part 1
-def overlaps_with_prev_result(s, p2, rc_type, result_list):
+def overlaps_with_prev_v1_result(start, end, rc_type, result_list):
     overlap = False
 
     for r in result_list:
-        # Only check for overlap between non_rc and non_rc
-        # and between rc and rc
-        if r[4] == rc_type:
-            # s = r[5], p2 = r[7]
-            if s >= r[5] and s < r[7]:
-                overlap = True
-            if p2 > r[5] and p2 <= r[7]:
-                overlap = True
+        # Only check for overlap with V1 gene type results
+        if r[5] == "V1":
+            # Only check for overlap between non_rc and non_rc
+            # and between rc and rc
+            if r[4] == rc_type:
+                # start = r[6], end = r[7]
+                if start >= r[6] and start < r[7]:
+                    overlap = True
+                if end > r[6] and end <= r[7]:
+                    overlap = True
+                if r[6] >= start and r[6] < end:
+                    overlap = True
 
     return overlap
 
@@ -152,17 +156,20 @@ def search_v1_motif(seq, p1, p2, rc, result_list):
             if tr_group == "":
                 tr_group = "TRV-SEL"
 
+            # Start and end position (python index)
+            start = s
+            end = p2
+
+            # Start and end postition (fasta index)
+            # Reduce end by one because end is not included in omega_nn
+            # Add one to start/end position as python index starts at 0
             if rc == "RC":
-                # convert reverse complement position to position on complement
-                # reduce p2 by one because p2 is not included in omega_nn
-                s_temp = len(seq) - 1 - s
-                p1_temp = len(seq) - 1 - p1
-                p2_temp = len(seq) - 1 - (p2 - 1)
+                # Convert reverse complement position to position on complement
+                start_fasta = (len(seq) - 1 - s) + 1
+                end_fasta = (len(seq) - 1 - (p2 - 1)) + 1
             else:
-                # reduce p2 by one because p2 is not included in omega_nn
-                s_temp = s
-                p1_temp = p1
-                p2_temp = p2 - 1
+                start_fasta = s + 1
+                end_fasta = (p2 - 1) + 1
 
             result_list.append([
                 omega_nn,
@@ -170,10 +177,11 @@ def search_v1_motif(seq, p1, p2, rc, result_list):
                 seq[p2:p2+39],
                 tr_group,
                 rc,
-                s_temp,
-                p1_temp,
-                p2_temp,
-                "V1"
+                "V1",
+                start,
+                end,
+                start_fasta,
+                end_fasta
                 ])
 
             # Skip ATG/AG and rssi between p1 and p2 + 39 nucleotides
@@ -200,8 +208,8 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
     # Reverse search to prioritize shorter result regions
     for s in reversed(candidates):
         # Check if omega_nn would overlap with previous result
-        if overlaps_with_prev_result(s + len(splice_site), p2,
-                                     rc, result_list):
+        if overlaps_with_prev_v1_result(s + len(splice_site), p2,
+                                        rc, result_list):
             continue
 
         # Limit to multiple of three (see p2_temp above)
@@ -233,17 +241,20 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
             if tr_group == "":
                 tr_group = "TRV"
 
+            # Start and end position (python index)
+            start = s + len(splice_site)
+            end = p2
+
+            # Start and end postition (fasta index)
+            # Reduce end by one because end is not included in omega_nn
+            # Add one to start/end position as python index starts at 0
             if rc == "RC":
-                # convert reverse complement position to position on complement
-                # reduce p2 by one because p2 is not included in omega_nn
-                s_temp = len(seq) - 1 - (s + len(splice_site))
-                p1_temp = len(seq) - 1 - p1
-                p2_temp = len(seq) - 1 - (p2 - 1)
+                # Convert reverse complement position to position on complement
+                start_fasta = (len(seq) - 1 - (s + len(splice_site))) + 1
+                end_fasta = (len(seq) - 1 - (p2 - 1)) + 1
             else:
-                # reduce p2 by one because p2 is not included in omega_nn
-                s_temp = s + len(splice_site)
-                p1_temp = p1
-                p2_temp = p2 - 1
+                start_fasta = (s + len(splice_site)) + 1
+                end_fasta = (p2 - 1) + 1
 
             result_list.append([
                 omega_nn,
@@ -251,10 +262,11 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
                 seq[p2:p2+39],
                 tr_group,
                 rc,
-                s_temp,
-                p1_temp,
-                p2_temp,
-                "V2"
+                "V2",
+                start,
+                end,
+                start_fasta,
+                end_fasta
                 ])
 
             # Skip ATG/AG and rssi between p1 and p2 + 39 nucleotides
