@@ -1,20 +1,25 @@
 import os
 import argparse
 
+program_name = "VJ-gene-finder"
+program_version = "1.0"
+program_description = ("Extraction of chicken TCR VJ gene segments"
+                       + "from a reference genome")
+program_epilog = "https://github.com/simonfrueh/VJ-gene-finder"
+
 
 # Parse command line arguments
 def parse_arguments():
     # Initialize command line argument parser
     parser = argparse.ArgumentParser(
-        prog="VJ-gene-finder",
-        description="Extraction of chicken TCR VJ gene segments"
-                    + "from a reference genome",
-        epilog="https://github.com/simonfrueh/VJ-gene-finder")
+        prog=program_name,
+        description=program_description,
+        epilog=program_epilog)
 
     # Add and parse arguments
     parser.add_argument("filename", help="Input file")
     parser.add_argument("-v", "--version", action="version",
-                        version="%(prog)s 0.99")
+                        version="%(prog)s "+program_version)
     parser.add_argument("-o", "--output", help="Output directory")
     args = parser.parse_args()
 
