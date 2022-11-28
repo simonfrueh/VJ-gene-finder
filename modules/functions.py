@@ -12,7 +12,7 @@ def ident_rss_motif_start_position(seq, motif):
 
     search_candidates = []
     for r in m.instances.search(seq):
-        # Pointer at 3' end of RSS motif
+        # Pointer at 5' end of RSS motif
         search_candidates.append(r[0])
 
     return search_candidates

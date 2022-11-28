@@ -1,5 +1,23 @@
 from Bio.Seq import Seq
 
+# define list of possible tr_group identifiers for usage in functions
+# search_v1_motif and search_v2_motif
+tr_list = [
+    ["TRAV1", "QVQQ"],
+    ["TRGV1", "QVLLQQ"],
+    ["TRAV2", "VSQQ"],
+    ["TRAV3", "LQYP"],
+    ["TRBV1", "LQQT"],
+    ["TRBV2", "EINQ"],
+    ["TRBV3", "ITQW"],
+    ["TRGV2", "PIQS"],
+    ["TRGV3", "AQA"],
+    ["TRGV4", "WQSP"],
+    ["TRDV1", "ETSGGGV"],
+    ["TRDV2", "LEASGGG"],
+    ["TRDV3", "EIHAKK"]
+    ]
+
 
 # Check motif criteria for V gene part 1
 # omega_aa: translated amino acid sequence of search region
@@ -113,22 +131,20 @@ def overlaps_with_prev_v1_result(start, end, rc_type, result_list):
 
 # Search and evaluate candidates for V gene part one
 # seq: Bio.Seq DNA sequence
-# p1, p2: range of seq to examine
+# start_sr, end_sr: start and end index of search region in seq
 # rc: "RC" / "" means reverse complement or not
 # result_list: list to append results
-def search_v1_motif(seq, p1, p2, rc, result_list):
+def search_v1_motif(seq, start_sr, end_sr, rc, result_list):
     candidates = []
     codon = "ATG"
 
-    # ATG only relevant within rss_i + 163 nucleotides
-    for s in range(p1, p1+163):
-        if seq[s:s+len(codon)] == codon:
-            candidates.append(s)
+    # ATG only relevant within first 163 nucleotides
+    for pos in range(start_sr, start_sr+163):
+        if seq[pos:pos+len(codon)] == codon:
+            candidates.append(pos)
 
     for s in candidates:
-
-        # Limit to multiple of three
-        omega_nn = seq[s:p2]
+        omega_nn = seq[s:end_sr]
 
         # Translate with NCBI standard table (limited to multiple of three)
         translate_end = len(omega_nn) - len(omega_nn) % 3
@@ -137,44 +153,29 @@ def search_v1_motif(seq, p1, p2, rc, result_list):
         if check_v1_motif_criteria(omega_aa) is False:
             continue
         else:
-            tr_list = [
-                ["TRAV1", "QVQQ"],
-                ["TRGV1", "QVLLQQ"],
-                ["TRAV2", "VSQQ"],
-                ["TRAV3", "LQYP"],
-                ["TRBV1", "LQQT"],
-                ["TRBV2", "EINQ"],
-                ["TRBV3", "ITQW"],
-                ["TRGV2", "PIQS"],
-                ["TRGV3", "AQA"],
-                ["TRGV4", "WQSP"],
-                ["TRDV1", "ETSGGGV"],
-                ["TRDV2", "LEASGGG"],
-                ["TRDV3", "EIHAKK"]
-                ]
             tr_group = assign_tr_group(omega_aa, len(omega_aa), tr_list)
             if tr_group == "":
                 tr_group = "TRV-SEL"
 
-            # Start and end position (python index)
+            # Start and end position (python index) of gene result
             start = s
-            end = p2
+            end = end_sr
 
             # Start and end postition (fasta index)
             # Reduce end by one because end is not included in omega_nn
             # Add one to start/end position as python index starts at 0
             if rc == "RC":
                 # Convert reverse complement position to position on complement
-                start_fasta = (len(seq) - 1 - s) + 1
-                end_fasta = (len(seq) - 1 - (p2 - 1)) + 1
+                start_fasta = (len(seq) - 1 - start) + 1
+                end_fasta = (len(seq) - 1 - (end - 1)) + 1
             else:
-                start_fasta = s + 1
-                end_fasta = (p2 - 1) + 1
+                start_fasta = start + 1
+                end_fasta = (end - 1) + 1
 
             result_list.append([
                 omega_nn,
                 omega_aa,
-                seq[p2:p2+39],
+                seq[end:end+39],
                 tr_group,
                 rc,
                 "V1",
@@ -184,9 +185,8 @@ def search_v1_motif(seq, p1, p2, rc, result_list):
                 end_fasta
                 ])
 
-            # Skip ATG/AG and rssi between p1 and p2 + 39 nucleotides
-            # and continue at step two for rssi+1
-            min_next_rss = p2 + 39
+            # Skip ATG and rss up to end + 39 nucleotides
+            min_next_rss = end + 39
             return min_next_rss
 
     return 0
@@ -194,26 +194,24 @@ def search_v1_motif(seq, p1, p2, rc, result_list):
 
 # Search and evaluate candidates for V gene part two
 # seq: Bio.Seq DNA sequence
-# p1, p2: range of seq to examine
+# start_sr, end_sr: start and end index of search region in seq
 # rc: "RC" / "" means reverse complement or not
 # result_list: list to append results
-def search_v2_motif(seq, p1, p2, rc, result_list):
+def search_v2_motif(seq, start_sr, end_sr, rc, result_list):
     candidates = []
     splice_site = "AG"
-
-    for s in range(p1, p2-(len(splice_site)+1)):
-        if seq[s:s+len(splice_site)] == splice_site:
-            candidates.append(s)
+    for pos in range(start_sr, end_sr-(len(splice_site)+1)):
+        if seq[pos:pos+len(splice_site)] == splice_site:
+            candidates.append(pos)
 
     # Reverse search to prioritize shorter result regions
     for s in reversed(candidates):
         # Check if omega_nn would overlap with previous result
-        if overlaps_with_prev_v1_result(s + len(splice_site), p2,
+        if overlaps_with_prev_v1_result(s + len(splice_site), end_sr,
                                         rc, result_list):
             continue
 
-        # Limit to multiple of three (see p2_temp above)
-        omega_nn = seq[s+len(splice_site):p2]
+        omega_nn = seq[s+len(splice_site):end_sr]
 
         # Translate with NCBI standard table (limited to multiple of three)
         translate_end = len(omega_nn) - (len(omega_nn) - 2) % 3
@@ -222,28 +220,13 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
         if check_v2_motif_criteria(omega_aa) is False:
             continue
         else:
-            tr_list = [
-                ["TRAV1", "QVQQ"],
-                ["TRGV1", "QVLLQQ"],
-                ["TRAV2", "VSQQ"],
-                ["TRAV3", "LQYP"],
-                ["TRBV1", "LQQT"],
-                ["TRBV2", "EINQ"],
-                ["TRBV3", "ITQW"],
-                ["TRGV2", "PIQS"],
-                ["TRGV3", "AQA"],
-                ["TRGV4", "WQSP"],
-                ["TRDV1", "ETSGGGV"],
-                ["TRDV2", "LEASGGG"],
-                ["TRDV3", "EIHAKK"]
-                ]
             tr_group = assign_tr_group(omega_aa, 15, tr_list)
             if tr_group == "":
                 tr_group = "TRV"
 
-            # Start and end position (python index)
+            # Start and end position (python index) of gene result
             start = s + len(splice_site)
-            end = p2
+            end = end_sr
 
             # Start and end postition (fasta index)
             # Reduce end by one because end is not included in omega_nn
@@ -251,15 +234,15 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
             if rc == "RC":
                 # Convert reverse complement position to position on complement
                 start_fasta = (len(seq) - 1 - (s + len(splice_site))) + 1
-                end_fasta = (len(seq) - 1 - (p2 - 1)) + 1
+                end_fasta = (len(seq) - 1 - (end - 1)) + 1
             else:
                 start_fasta = (s + len(splice_site)) + 1
-                end_fasta = (p2 - 1) + 1
+                end_fasta = (end - 1) + 1
 
             result_list.append([
                 omega_nn,
                 omega_aa,
-                seq[p2:p2+39],
+                seq[end:end+39],
                 tr_group,
                 rc,
                 "V2",
@@ -269,9 +252,8 @@ def search_v2_motif(seq, p1, p2, rc, result_list):
                 end_fasta
                 ])
 
-            # Skip ATG/AG and rssi between p1 and p2 + 39 nucleotides
-            # and continue at step 2 for rssi+1
-            min_next_rss = p2 + 39
+            # Skip AG and rss up to end + 39 nucleotides
+            min_next_rss = end + 39
             return min_next_rss
 
     return 0
@@ -286,13 +268,9 @@ def task_v1(seq, rss, rc, result_list):
     min_next_r = 0
 
     for r in rss:
-        # Obey minimum r and perform search
+        # Obey minimum r and perform search in search region [r-483:r]
         if r >= 483 and r >= min_next_r:
-            # Define search region
-            # RSS motif 5'-CAC-3' is cut off at 5'-end
-            p1 = r - 483
-            p2 = r
-            min_next_r = search_v1_motif(seq, p1, p2, rc, result_list)
+            min_next_r = search_v1_motif(seq, r-483, r, rc, result_list)
 
 
 # V gene V2: V segments with two-exon leader peptide (all others)
@@ -304,10 +282,6 @@ def task_v2(seq, rss, rc, result_list):
     min_next_r = 0
 
     for r in rss:
-        # Obey minimum r and perform search
+        # Obey minimum r and perform search in search region [r-345:r]
         if r >= 345 and r >= min_next_r:
-            # Define search region
-            # RSS motif 5'-CAC-3' is cut off at 5'-end
-            p1 = r - 345
-            p2 = r
-            min_next_r = search_v2_motif(seq, p1, p2, rc, result_list)
+            min_next_r = search_v2_motif(seq, r-345, r, rc, result_list)
