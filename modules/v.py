@@ -4,18 +4,22 @@ from Bio.Seq import Seq
 # search_v1_motif and search_v2_motif
 tr_list = [
     ["TRAV1", "QVQQ"],
-    ["TRGV1", "QVLLQQ"],
     ["TRAV2", "VSQQ"],
     ["TRAV3", "LQYP"],
     ["TRBV1", "LQQT"],
     ["TRBV2", "EINQ"],
     ["TRBV3", "ITQW"],
+    ["TRGV1", "QVLLQQ"],
     ["TRGV2", "PIQS"],
-    ["TRGV3", "AQA"],
-    ["TRGV4", "WQSP"],
+    ["TRGV3", "QAVPMQ"],
+    ["TRGV3", "QAAPVQ"],
+    ["TRGV4", "LWQSP"],
     ["TRDV1", "ETSGGGV"],
     ["TRDV2", "LEASGGG"],
-    ["TRDV3", "EIHAKK"]
+    ["TRDV3", "VEFGGDV"],
+    ["TRDV4", "RIVEAG"],
+    ["TRDV5", "EIHAKKSA"],
+    ["TRDVH1", "QIEMVTT"]
     ]
 
 
