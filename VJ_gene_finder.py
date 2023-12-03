@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 ########################################################################
 # VJ-gene-finder
 # algorithm: Simon Frueh
