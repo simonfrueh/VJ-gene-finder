@@ -39,7 +39,7 @@ Additionally, VJ-gene-finder tentatively assigns candidate V genes to chicken V 
 **Note:** These motifs are based on chicken TRV families. If desired, the algorithm can be modified by altering the TRV | amino acid assignment in the v.py module. 
 
 ## Requirements
-VJ-gene-finder requires that Python and [Biopython] (https://biopython.org/) are installed and running.
+VJ-gene-finder requires that Python and [Biopython](https://biopython.org/) are installed and running.
 
 ## Installation
 Download the latest release and unzip.
@@ -75,8 +75,8 @@ The VJ-gene-finder output generates three files. The files are named using the G
 **Results should be evaluated manually** because the search parameters are not specific to VJ genes only. 
 
 1) Unspecific hits outside of the TCR loci can be removed.
-    - The location of the TCR loci on the chromosome can be identified by alignment of the hit list, for example with [Clustal Omega] (https://www.ebi.ac.uk/Tools/msa/clustalo/).
-    - Using a alignment viewer, such as [Jalview] (https://www.jalview.org/), the cluster of highly similar TCR sequences (named by gene family) on the forward and reverse strand can be distinguished from unspecific hits outside of the TCR loci.
+    - The location of the TCR loci on the chromosome can be identified by alignment of the hit list, for example with [Clustal Omega](https://www.ebi.ac.uk/Tools/msa/clustalo/).
+    - Using a alignment viewer, such as [Jalview](https://www.jalview.org/), the cluster of highly similar TCR sequences (named by gene family) on the forward and reverse strand can be distinguished from unspecific hits outside of the TCR loci.
 2) The start and end position of V genes need to be evaluated.
     - Start position: If the V gene is part of an open reading frame with an _ATG_ start codon close to the putative V gene, VJ-gene-finder includes the whole open reading frame in the sequence. This behavior is desired for V genes with a single exon leader peptide, but provides false start positions for V genes with a spliced leader sequence. In this case the _AG_ splice site needs to be identified manually.  
     - End position: if there is a _CACAC_ motif, VJ-gene finder picks the first _CAC_ to define the end position, however, in our experience, the conserved RSS sequence usually begins at the second _CAC_.
