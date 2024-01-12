@@ -36,10 +36,10 @@ Additionally, VJ-gene-finder tentatively assigns candidate V genes to chicken V 
 | TRDV5            | EIHAKKSA         |
 | TRDVH1           | QIEMVTT          |
 
-Note: These motifs are based on chicken TRV families. If desired, the algorithm can be modified by altering the TRV | amino acid assignment in the v.py module. 
+**Note:** These motifs are based on chicken TRV families. If desired, the algorithm can be modified by altering the TRV | amino acid assignment in the v.py module. 
 
 ## Requirements
-VJ-gene-finder requires that Python is installed and running.
+VJ-gene-finder requires that Python and [Biopython] (https://biopython.org/) are installed and running.
 
 ## Installation
 Download the latest release and unzip.
@@ -47,14 +47,18 @@ Download the latest release and unzip.
 ## Usage
 
 ```
-python3 PATH_TO_VJ_GENE_FINDER_FOLDER/VJ_gene_finder.py PATH_TO_CHROMOSOME_FILE.fasta -o output
+python3 VJ_gene_finder.py [-h] [-v] [-o OUTPUT] filename
 ```
+| Argument                   |                              | 
+| -------------------------  | -------------------------    |
+| filename                   | Input file in fasta format   |
 
-| Option                    | Argument                           | 
-| ------------------------- | ---------------------------------- |
-| filename (REQUIRED)       | provide input file in fasta format |
-| -v / --version (optional) | use specific version               |
-| -o / --output (optional)  | provide output directory           |
+| Options                    |                              |
+| -------------------------- | --------------------------   |
+| -h, --help                 | Show help message and exit   |
+| -v, --version              | Show version number and exit |
+| -o OUTPUT, --output OUTPUT | Output directory             |
+
 
 ## Results
 
@@ -63,7 +67,7 @@ The VJ-gene-finder output generates three files. The files are named using the G
 1) Accession_number.fasta
     - This file contains nucleic acid sequences of putative V and J genes with preliminary assignment to chicken TRV gene families and a unique identifier for each hit based on the location on the chromosome. If a TRV gene family could not be assigned, the hits are named either TRV with a unique ID, or TRV-SEL (single exon leader) with a unique ID when the V gene is part of an open reading frame with an _ATG_ start codon (within the length constraints). Additional information is provided in the fasta header, including the accession number, putative functionality (F = functional), and the start and end position on the forward or reverse strand (RC = reverse complement) of the original DNA sequence. 
 2) Accession_number_aa.fasta
-    - This file contains amino acid sequences of V and J gene hits with additional information in the fast header, as described above. 
+    - This file contains amino acid sequences of V and J gene hits with additional information in the fasta header, as described above. 
 3) Accession_number_RSS.fasta
     - This file contains recombination signal sequences (RSS) corresponding to V and J gene hits with additional information in the fasta header, as described above. 
 
