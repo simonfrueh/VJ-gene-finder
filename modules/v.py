@@ -1,5 +1,3 @@
-from Bio.Seq import Seq
-
 # define list of possible tr_group identifiers for usage in functions
 # search_v1_motif and search_v2_motif
 tr_list = [

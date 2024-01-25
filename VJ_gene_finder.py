@@ -5,7 +5,6 @@
 # implementation: Martin Frueh
 ########################################################################
 
-from Bio.Seq import Seq
 from Bio import SeqIO
 
 import modules.init as i

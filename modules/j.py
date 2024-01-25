@@ -1,6 +1,3 @@
-from Bio.Seq import Seq
-from Bio import motifs
-
 import modules.functions as f
 
 # Resolve wobble bases for usage in fuction search_j_motif (here at highest

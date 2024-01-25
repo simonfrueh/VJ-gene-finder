@@ -7,13 +7,12 @@ from Bio import motifs
 # motif: RSS motif
 def ident_rss_motif_start_position(seq, motif):
     # Identify search candidates by RSS motif
-    instances = [Seq(motif)]
-    m = motifs.create(instances)
+    m = motifs.create([Seq(motif)])
 
     search_candidates = []
-    for r in m.instances.search(seq):
+    for p, s in seq.search(m.alignment):
         # Pointer at 5' end of RSS motif
-        search_candidates.append(r[0])
+        search_candidates.append(p)
 
     return search_candidates
 
@@ -23,13 +22,12 @@ def ident_rss_motif_start_position(seq, motif):
 # motif: RSS motif
 def ident_rss_motif_end_position(seq, motif):
     # Identify search candidates by RSS motif
-    instances = [Seq(motif)]
-    m = motifs.create(instances)
+    m = motifs.create([Seq(motif)])
 
     search_candidates = []
-    for r in m.instances.search(seq):
+    for pos, s in seq.search(m.alignment):
         # Pointer at 3' end of RSS motif
-        search_candidates.append(r[0] + len(motif))
+        search_candidates.append(pos + len(motif))
 
     return search_candidates
 
