@@ -39,7 +39,7 @@ Additionally, VJ-gene-finder tentatively assigns candidate V genes to chicken V 
 **Note:** These motifs are based on chicken TRV families. If desired, the algorithm can be modified by altering the TRV | amino acid assignment in the v.py module. 
 
 ## Requirements
-VJ-gene-finder requires that Python and [Biopython](https://biopython.org/) are installed and running.
+VJ-gene-finder requires that Python and [Biopython](https://biopython.org/) (biopython-1.83) are installed and running.
 
 ## Installation
 Download the latest release and unzip.
