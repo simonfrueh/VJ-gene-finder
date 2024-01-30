@@ -1,3 +1,5 @@
+import modules.functions as f
+
 # define list of possible tr_group identifiers for usage in functions
 # search_v1_motif and search_v2_motif
 tr_list = [
@@ -111,21 +113,20 @@ def assign_tr_group(omega_aa, n, tr_list):
 
 # Check whether search region defined by start and end overlaps with
 # previous results from V part 1
-def overlaps_with_prev_v1_result(start, end, rc_type, result_list):
+def overlaps_with_prev_v1_result(start, end, is_rc, result_list):
     overlap = False
 
     for r in result_list:
         # Only check for overlap with V1 gene type results
-        if r[5] == "V1":
+        if r["gene_type"] == "V1":
             # Only check for overlap between non_rc and non_rc
             # and between rc and rc
-            if r[4] == rc_type:
-                # start = r[6], end = r[7]
-                if start >= r[6] and start < r[7]:
+            if r["is_reverse_complement"] == is_rc:
+                if start >= r["start_pos"] and start < r["end_pos"]:
                     overlap = True
-                if end > r[6] and end <= r[7]:
+                if end > r["start_pos"] and end <= r["end_pos"]:
                     overlap = True
-                if r[6] >= start and r[6] < end:
+                if r["start_pos"] >= start and r["start_pos"] < end:
                     overlap = True
 
     return overlap
@@ -134,9 +135,9 @@ def overlaps_with_prev_v1_result(start, end, rc_type, result_list):
 # Search and evaluate candidates for V gene part one
 # seq: Bio.Seq DNA sequence
 # start_sr, end_sr: start and end index of search region in seq
-# rc: "RC" / "" means reverse complement or not
+# rc: True means seq is a reverse complement
 # result_list: list to append results
-def search_v1_motif(seq, start_sr, end_sr, rc, result_list):
+def search_v1_motif(seq, start_sr, end_sr, is_rc, result_list):
     candidates = []
     codon = "ATG"
 
@@ -163,29 +164,20 @@ def search_v1_motif(seq, start_sr, end_sr, rc, result_list):
             start = s
             end = end_sr
 
-            # Start and end postition (fasta index)
-            # Reduce end by one because end is not included in omega_nn
-            # Add one to start/end position as python index starts at 0
-            if rc == "RC":
-                # Convert reverse complement position to position on complement
-                start_fasta = (len(seq) - 1 - start) + 1
-                end_fasta = (len(seq) - 1 - (end - 1)) + 1
-            else:
-                start_fasta = start + 1
-                end_fasta = (end - 1) + 1
+            gene_result_dict = {
+                "omega_nn": omega_nn,
+                "omega_aa": omega_aa,
+                "seq": seq[end:end+39],
+                "tr_group": tr_group,
+                "is_reverse_complement": is_rc,
+                "gene_type": "V1",
+                "start_pos": start,
+                "end_pos": end,
+                "start_pos_fasta": f.start_to_fasta(len(seq), start, is_rc),
+                "end_pos_fasta": f.end_to_fasta(len(seq), end, is_rc)
+            }
 
-            result_list.append([
-                omega_nn,
-                omega_aa,
-                seq[end:end+39],
-                tr_group,
-                rc,
-                "V1",
-                start,
-                end,
-                start_fasta,
-                end_fasta
-                ])
+            result_list.append(gene_result_dict)
 
             # Skip ATG and rss up to end + 39 nucleotides
             min_next_rss = end + 39
@@ -197,9 +189,9 @@ def search_v1_motif(seq, start_sr, end_sr, rc, result_list):
 # Search and evaluate candidates for V gene part two
 # seq: Bio.Seq DNA sequence
 # start_sr, end_sr: start and end index of search region in seq
-# rc: "RC" / "" means reverse complement or not
+# is_rc: True means seq is a reverse complement
 # result_list: list to append results
-def search_v2_motif(seq, start_sr, end_sr, rc, result_list):
+def search_v2_motif(seq, start_sr, end_sr, is_rc, result_list):
     candidates = []
     splice_site = "AG"
     for pos in range(start_sr, end_sr-(len(splice_site)+1)):
@@ -210,7 +202,7 @@ def search_v2_motif(seq, start_sr, end_sr, rc, result_list):
     for s in reversed(candidates):
         # Check if omega_nn would overlap with previous result
         if overlaps_with_prev_v1_result(s + len(splice_site), end_sr,
-                                        rc, result_list):
+                                        is_rc, result_list):
             continue
 
         omega_nn = seq[s+len(splice_site):end_sr]
@@ -230,29 +222,20 @@ def search_v2_motif(seq, start_sr, end_sr, rc, result_list):
             start = s + len(splice_site)
             end = end_sr
 
-            # Start and end postition (fasta index)
-            # Reduce end by one because end is not included in omega_nn
-            # Add one to start/end position as python index starts at 0
-            if rc == "RC":
-                # Convert reverse complement position to position on complement
-                start_fasta = (len(seq) - 1 - (s + len(splice_site))) + 1
-                end_fasta = (len(seq) - 1 - (end - 1)) + 1
-            else:
-                start_fasta = (s + len(splice_site)) + 1
-                end_fasta = (end - 1) + 1
+            gene_result_dict = {
+                "omega_nn": omega_nn,
+                "omega_aa": omega_aa,
+                "seq": seq[end:end+39],
+                "tr_group": tr_group,
+                "is_reverse_complement": is_rc,
+                "gene_type": "V2",
+                "start_pos": start,
+                "end_pos": end,
+                "start_pos_fasta": f.start_to_fasta(len(seq), start, is_rc),
+                "end_pos_fasta": f.end_to_fasta(len(seq), end, is_rc)
+            }
 
-            result_list.append([
-                omega_nn,
-                omega_aa,
-                seq[end:end+39],
-                tr_group,
-                rc,
-                "V2",
-                start,
-                end,
-                start_fasta,
-                end_fasta
-                ])
+            result_list.append(gene_result_dict)
 
             # Skip AG and rss up to end + 39 nucleotides
             min_next_rss = end + 39
@@ -264,26 +247,26 @@ def search_v2_motif(seq, start_sr, end_sr, rc, result_list):
 # V gene V1: V segments with single-exon leader peptide (TRAV1 and TRGV1)
 # seq: Bio.Seq DNA sequence
 # rss: index list of search candidates identified by RSS motif
-# rc: "RC" / "" is reverse complement or not
+# is_rc: True means seq is a reverse complement
 # result_list: list to append results
-def task_v1(seq, rss, rc, result_list):
+def task_v1(seq, rss, is_rc, result_list):
     min_next_r = 0
 
     for r in rss:
         # Obey minimum r and perform search in search region [r-483:r]
         if r >= 483 and r >= min_next_r:
-            min_next_r = search_v1_motif(seq, r-483, r, rc, result_list)
+            min_next_r = search_v1_motif(seq, r-483, r, is_rc, result_list)
 
 
 # V gene V2: V segments with two-exon leader peptide (all others)
 # seq: Bio.Seq DNA sequence
 # rss: index list of search candidates identified by RSS motif
-# rc: "RC" / "" is reverse complement or not
+# is_rc: True means seq is a reverse complement
 # result_list: list to append results
-def task_v2(seq, rss, rc, result_list):
+def task_v2(seq, rss, is_rc, result_list):
     min_next_r = 0
 
     for r in rss:
         # Obey minimum r and perform search in search region [r-345:r]
         if r >= 345 and r >= min_next_r:
-            min_next_r = search_v2_motif(seq, r-345, r, rc, result_list)
+            min_next_r = search_v2_motif(seq, r-345, r, is_rc, result_list)

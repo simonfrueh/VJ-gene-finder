@@ -36,14 +36,15 @@ def write_results(output_dir, sec_record_id, result_list):
 
     for r in result_list:
         # Determine fasta header
-        header = (r[3] + "-" + str(r[8]) + "*01|" + sec_record_id
-                  + "|F|" + str(r[8]) + "-" + str(r[9]) + "|")
-        if r[4] == "RC":
+        header = (r["tr_group"] + "-" + str(r["start_pos_fasta"]) + "*01|"
+                  + sec_record_id + "|F|" + str(r["start_pos_fasta"]) + "-"
+                  + str(r["end_pos_fasta"]) + "|")
+        if r["is_reverse_complement"]:
             header += "RC|"
 
         # Prepare record for fasta file (omega_nn)
         rec = SeqRecord(
-            Seq(r[0],),
+            Seq(r["omega_nn"],),
             id=header,
             description="",
         )
@@ -51,9 +52,9 @@ def write_results(output_dir, sec_record_id, result_list):
 
         # Prepare record for fasta file (omega_aa)
         # check and skip if omega_aa is empty (possible for J genes)
-        if r[1] != "":
+        if r["omega_aa"] != "":
             rec = SeqRecord(
-                Seq(r[1],),
+                Seq(r["omega_aa"],),
                 id=header,
                 description="",
             )
@@ -61,10 +62,11 @@ def write_results(output_dir, sec_record_id, result_list):
 
         # Prepare record for fasta file (rss)
         # Use differen header for J genes
-        if r[5] == "J":
-            header = "TRJ-" + str(r[8]) + "*01|" + sec_record_id + "|"
+        if r["gene_type"] == "J":
+            header = ("TRJ-" + str(r["start_pos_fasta"]) + "*01|"
+                      + sec_record_id + "|")
         rec = SeqRecord(
-            Seq(r[2],),
+            Seq(r["seq"],),
             id="RSS-"+header,
             description="",
         )

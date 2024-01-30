@@ -55,9 +55,9 @@ def check_j_motif_criteria(omega_nn, omega_aa):
 # Search and evaluate candidates for V gene part one
 # seq: Bio.Seq DNA sequence
 # start_sr, end_sr: start and end index of search region in seq
-# rc: "RC" / "" means reverse complement or not
+# is_rc: True means seq is a reverse complement
 # result_list: list to append results
-def search_j_motif(seq, start_sr, end_sr, rc, result_list):
+def search_j_motif(seq, start_sr, end_sr, is_rc, result_list):
     candidates = []
     for pos in range(start_sr+44, end_sr-(len(codon_list[0])+1)):
         if codon_list.count(seq[pos:pos+len(codon_list[0])]) > 0:
@@ -83,29 +83,20 @@ def search_j_motif(seq, start_sr, end_sr, rc, result_list):
             start = start_sr
             end = s
 
-            # start and end postition (fasta index)
-            # Reduce end by one because end is not included in omega_nn
-            # Add one to start/end position as python index starts at 0
-            if rc == "RC":
-                # convert reverse complement position to position on complement
-                start_fasta = (len(seq) - 1 - start) + 1
-                end_fasta = (len(seq) - 1 - (end - 1)) + 1
-            else:
-                start_fasta = start + 1
-                end_fasta = (end - 1) + 1
+            gene_result_dict = {
+                "omega_nn": omega_nn,
+                "omega_aa": "",
+                "seq": seq[start-28:start],
+                "tr_group": "TRJ",
+                "is_reverse_complement": is_rc,
+                "gene_type": "J",
+                "start_pos": start,
+                "end_pos": end,
+                "start_pos_fasta": f.start_to_fasta(len(seq), start, is_rc),
+                "end_pos_fasta": f.end_to_fasta(len(seq), end, is_rc)
+            }
 
-            result_list.append([
-                omega_nn,
-                "",
-                seq[start-28:start],
-                "TRJ",
-                rc,
-                "J",
-                start,
-                end,
-                start_fasta,
-                end_fasta
-                ])
+            result_list.append(gene_result_dict)
 
             # Skip GTRDGD and rss up to end + 6 nucleotides
             min_next_rss = end + 6
@@ -117,12 +108,12 @@ def search_j_motif(seq, start_sr, end_sr, rc, result_list):
 # J gene
 # seq: Bio.Seq DNA sequence
 # rss: index list of search candidates identified by RSS motif
-# rc: "RC" / "" is reverse complement or not
+# is_rc: True means seq is a reverse complement
 # result_list: list to append results
-def task_j(seq, rss, rc, result_list):
+def task_j(seq, rss, is_rc, result_list):
     min_next_r = 0
 
     for r in rss:
         # Obey maximum r and perform search in search region [r:r+78]
         if r + 78 <= len(seq) and r >= min_next_r:
-            min_next_r = search_j_motif(seq, r, r+78, rc, result_list)
+            min_next_r = search_j_motif(seq, r, r+78, is_rc, result_list)

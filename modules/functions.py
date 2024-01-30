@@ -107,3 +107,28 @@ def list_resolve_wobble_bases(seq_list):
             seq_list.append(seq_list[i].replace("N", "T", 1))
             seq_list.pop(i)
             list_resolve_wobble_bases(seq_list)
+
+
+# Convert start position to fasta index
+# Add +1 to start_pos as python index starts at 0
+def start_to_fasta(seq_len, start_pos, is_reverse_complement):
+    if is_reverse_complement:
+        # convert reverse complement position to position on complement
+        start_pos_fasta = (seq_len - 1 - start_pos) + 1
+    else:
+        start_pos_fasta = start_pos + 1
+
+    return start_pos_fasta
+
+
+# Convert end position to fasta index
+# Reduce end_pos by one because end is not included in omega_nn
+# Add +1 to end_pos as python index starts at 0
+def end_to_fasta(seq_len, end_pos, is_reverse_complement):
+    if is_reverse_complement:
+        # convert reverse complement position to position on complement
+        end_pos_fasta = (seq_len - 1 - (end_pos - 1)) + 1
+    else:
+        end_pos_fasta = (end_pos - 1) + 1
+
+    return end_pos_fasta

@@ -46,25 +46,25 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " single-exon leader peptide")
-    v.task_v1(seq_data, rss, "", result_list)
+    v.task_v1(seq_data, rss, False, result_list)
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " single-exon leader peptide in reverse complement (RC)")
-    v.task_v1(seq_data_rc, rss_rc, "RC", result_list)
+    v.task_v1(seq_data_rc, rss_rc, True, result_list)
 
     # Search V segments with two-exon leader peptide (all others)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " two-exon leader peptide")
-    v.task_v2(seq_data, rss, "", result_list)
+    v.task_v2(seq_data, rss, False, result_list)
 
     # Search V segments with two-exon leader peptide (all others) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
           + " two-exon leader peptide in reverse complement (RC)")
-    v.task_v2(seq_data_rc, rss_rc, "RC", result_list)
+    v.task_v2(seq_data_rc, rss_rc, True, result_list)
 
     # Identify J search candidates by RSS motif GTG
     task_i += 1
@@ -76,13 +76,13 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     # Search J segments
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J segments")
-    j.task_j(seq_data, rss, "", result_list)
+    j.task_j(seq_data, rss, False, result_list)
 
     # Search J segments (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J in reverse"
           + " complement (RC)")
-    j.task_j(seq_data_rc, rss_rc, "RC", result_list)
+    j.task_j(seq_data_rc, rss_rc, True, result_list)
 
     # Show results and write result files
     r.show_results(result_list)
