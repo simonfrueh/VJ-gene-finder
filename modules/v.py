@@ -26,14 +26,15 @@ tr_list = [
 # Check motif criteria for V gene part 1
 # omega_aa: translated amino acid sequence of search region
 def check_v1_motif_criteria(omega_aa):
+    omega_aa_len = len(omega_aa)
+
     # omega_nn does not contain a stop codon TAA, TAG or TGA
     # or omega_aa does not contain *
     if omega_aa.count("*") > 0:
         return False
 
     # Length Ωaa > 102 and < 161
-    if (len(omega_aa) <= 102 or
-            len(omega_aa) >= 161):
+    if (omega_aa_len <= 102 or omega_aa_len >= 161):
         return False
 
     # z1 = Cys/C between 32 - 82 (Ωaa)
@@ -48,12 +49,12 @@ def check_v1_motif_criteria(omega_aa):
 
     # z3 = Y* motif in the last 12 amino acids
     # Ωaa (Y* = YYC, YFC, YLC, YHC, YIC, TFC)
-    count_Y = omega_aa[-12:len(omega_aa)].count("YYC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YFC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YLC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YHC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YIC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("TFC")
+    count_Y = omega_aa[-12:omega_aa_len].count("YYC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YLC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YHC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YFC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YIC")
+    count_Y += omega_aa[-12:omega_aa_len].count("TFC")
     if count_Y == 0:
         return False
 
@@ -63,14 +64,15 @@ def check_v1_motif_criteria(omega_aa):
 # Check motif criteria for V gene part 2
 # omega_aa: translated amino acid sequence of search region
 def check_v2_motif_criteria(omega_aa):
+    omega_aa_len = len(omega_aa)
+
     # omega_nn does not contain a stop codon TAA, TAG or TGA
     # or omega_aa does not contain *
     if omega_aa.count("*") > 0:
         return False
 
     # Length Ωaa > 85 and < 115
-    if (len(omega_aa) <= 85 or
-            len(omega_aa) >= 115):
+    if (omega_aa_len <= 85 or omega_aa_len >= 115):
         return False
 
     # z1 = Cys/C between 19 - 33 (Ωaa )
@@ -85,12 +87,12 @@ def check_v2_motif_criteria(omega_aa):
 
     # z3 = Y* motif in the last 12 amino acids
     # Ωaa (Y* = YYC, YFC, YLC, YHC, YIC, TFC)
-    count_Y = omega_aa[-12:len(omega_aa)].count("YYC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YFC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YLC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YHC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("YIC")
-    count_Y += omega_aa[-12:len(omega_aa)].count("TFC")
+    count_Y = omega_aa[-12:omega_aa_len].count("YYC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YFC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YLC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YHC")
+    count_Y += omega_aa[-12:omega_aa_len].count("YIC")
+    count_Y += omega_aa[-12:omega_aa_len].count("TFC")
     if count_Y == 0:
         return False
 
@@ -114,8 +116,6 @@ def assign_tr_group(omega_aa, n, tr_list):
 # Check whether search region defined by start and end overlaps with
 # previous results from V part 1
 def overlaps_with_prev_v1_result(start, end, is_rc, result_list):
-    overlap = False
-
     for r in result_list:
         # Only check for overlap with V1 gene type results
         if r["gene_type"] == "V1":
@@ -123,13 +123,13 @@ def overlaps_with_prev_v1_result(start, end, is_rc, result_list):
             # and between rc and rc
             if r["is_reverse_complement"] == is_rc:
                 if start >= r["start_pos"] and start < r["end_pos"]:
-                    overlap = True
+                    return True
                 if end > r["start_pos"] and end <= r["end_pos"]:
-                    overlap = True
+                    return True
                 if r["start_pos"] >= start and r["start_pos"] < end:
-                    overlap = True
+                    return True
 
-    return overlap
+    return False
 
 
 # Search and evaluate candidates for V gene part one
