@@ -27,8 +27,15 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     print("\nProcessing data")
 
     # Prepare DNA strand and reverse complement
-    seq_data = seq_record.seq.upper()
-    seq_data_rc = seq_data.reverse_complement()
+    seq = {}
+    seq["seq"] = seq_record.seq.upper()
+    seq["is_rc"] = False
+    seq["len"] = len(seq["seq"])
+
+    seq_rc = {}
+    seq_rc["seq"] = seq["seq"].reverse_complement()
+    seq_rc["is_rc"] = True
+    seq_rc["len"] = len(seq_rc["seq"])
 
     # Prepare total number of tasks and result list
     tasks = 8
@@ -38,51 +45,51 @@ for seq_record in SeqIO.parse(path + filename, "fasta"):
     # Identify V search candidates by RSS motif CAC
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify V search candidates"
-          + " by RSS motif CAC")
-    rss = f.ident_rss_motif_start_position(seq_data, "CAC")
-    rss_rc = f.ident_rss_motif_start_position(seq_data_rc, "CAC")
+          " by RSS motif CAC")
+    seq["rss_V"] = f.ident_rss_motif_start_position(seq["seq"], "CAC")
+    seq_rc["rss_V"] = f.ident_rss_motif_start_position(seq_rc["seq"], "CAC")
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
-          + " single-exon leader peptide")
-    v.task_v1(seq_data, rss, False, result_list)
+          " single-exon leader peptide")
+    v.task_v1(seq, result_list)
 
     # Search V segments with single-exon leader peptide (TRAV1 and TRGV1) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
-          + " single-exon leader peptide in reverse complement (RC)")
-    v.task_v1(seq_data_rc, rss_rc, True, result_list)
+          " single-exon leader peptide in reverse complement (RC)")
+    v.task_v1(seq_rc, result_list)
 
     # Search V segments with two-exon leader peptide (all others)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
-          + " two-exon leader peptide")
-    v.task_v2(seq_data, rss, False, result_list)
+          " two-exon leader peptide")
+    v.task_v2(seq, result_list)
 
     # Search V segments with two-exon leader peptide (all others) (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for V segments with"
-          + " two-exon leader peptide in reverse complement (RC)")
-    v.task_v2(seq_data_rc, rss_rc, True, result_list)
+          " two-exon leader peptide in reverse complement (RC)")
+    v.task_v2(seq_rc, result_list)
 
     # Identify J search candidates by RSS motif GTG
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " identify J search candidates"
-          + " by RSS motif GTG")
-    rss = f.ident_rss_motif_end_position(seq_data, "GTG")
-    rss_rc = f.ident_rss_motif_end_position(seq_data_rc, "GTG")
+          " by RSS motif GTG")
+    seq["rss_J"] = f.ident_rss_motif_end_position(seq["seq"], "GTG")
+    seq_rc["rss_J"] = f.ident_rss_motif_end_position(seq_rc["seq"], "GTG")
 
     # Search J segments
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J segments")
-    j.task_j(seq_data, rss, False, result_list)
+    j.task_j(seq, result_list)
 
     # Search J segments (RC)
     task_i += 1
     print("(%i/%i)" % (task_i, tasks) + " search for J in reverse"
-          + " complement (RC)")
-    j.task_j(seq_data_rc, rss_rc, True, result_list)
+          " complement (RC)")
+    j.task_j(seq_rc, result_list)
 
     # Show results and write result files
     r.show_results(result_list)
