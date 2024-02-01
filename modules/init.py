@@ -2,7 +2,7 @@ import os
 import argparse
 
 program_name = "VJ-gene-finder"
-program_version = "1.0"
+program_version = "0.1+"
 program_description = ("Extraction of chicken TCR VJ gene segments"
                        + "from a reference genome")
 program_epilog = "https://github.com/simonfrueh/VJ-gene-finder"
