@@ -137,7 +137,8 @@ def overlaps_with_prev_v1_result(start, end, is_rc, result_list):
 # seq["is_rc"]: True means seq is a reverse complement
 # start_sr, end_sr: start and end index of search region in seq
 # result_list: list to append results
-def search_v1_motif(seq, start_sr, end_sr, result_list):
+# skip_trgf: skip TR group family assignment
+def search_v1_motif(seq, start_sr, end_sr, result_list, skip_trgf):
     candidates = []
     codon = "ATG"
 
@@ -156,7 +157,10 @@ def search_v1_motif(seq, start_sr, end_sr, result_list):
         if check_v1_motif_criteria(omega_aa) is False:
             continue
         else:
-            tr_group = assign_tr_group(omega_aa, len(omega_aa), tr_list)
+            if skip_trgf:
+                tr_group = ""
+            else:
+                tr_group = assign_tr_group(omega_aa, len(omega_aa), tr_list)
             if tr_group == "":
                 tr_group = "TRV-SEL"
 
@@ -192,7 +196,8 @@ def search_v1_motif(seq, start_sr, end_sr, result_list):
 # seq["is_rc"]: True means seq is a reverse complement
 # start_sr, end_sr: start and end index of search region in seq
 # result_list: list to append results
-def search_v2_motif(seq, start_sr, end_sr, result_list):
+# skip_trgf: skip TR group family assignment
+def search_v2_motif(seq, start_sr, end_sr, result_list, skip_trgf):
     candidates = []
     splice_site = "AG"
     for pos in range(start_sr, end_sr-(len(splice_site)+1)):
@@ -215,7 +220,10 @@ def search_v2_motif(seq, start_sr, end_sr, result_list):
         if check_v2_motif_criteria(omega_aa) is False:
             continue
         else:
-            tr_group = assign_tr_group(omega_aa, 15, tr_list)
+            if skip_trgf:
+                tr_group = ""
+            else:
+                tr_group = assign_tr_group(omega_aa, 15, tr_list)
             if tr_group == "":
                 tr_group = "TRV"
 
@@ -251,13 +259,14 @@ def search_v2_motif(seq, start_sr, end_sr, result_list):
 # seq["rss"]: index list of search candidates identified by RSS motif
 # seq["is_rc"]: True means seq is a reverse complement
 # result_list: list to append results
-def task_v1(seq, result_list):
+# skip_trgf: skip TR group family assignment
+def task_v1(seq, result_list, skip_trgf):
     min_next_r = 0
 
     for r in seq["rss_V"]:
         # Obey minimum r and perform search in search region [r-483:r]
         if r >= 483 and r >= min_next_r:
-            min_next_r = search_v1_motif(seq, r-483, r, result_list)
+            min_next_r = search_v1_motif(seq, r-483, r, result_list, skip_trgf)
 
 
 # V gene V2: V segments with two-exon leader peptide (all others)
@@ -265,10 +274,11 @@ def task_v1(seq, result_list):
 # seq["rss"]: index list of search candidates identified by RSS motif
 # seq["is_rc"]: True means seq is a reverse complement
 # result_list: list to append results
-def task_v2(seq, result_list):
+# skip_trgn: skip TR group family assignment
+def task_v2(seq, result_list, skip_trgf):
     min_next_r = 0
 
     for r in seq["rss_V"]:
         # Obey minimum r and perform search in search region [r-345:r]
         if r >= 345 and r >= min_next_r:
-            min_next_r = search_v2_motif(seq, r-345, r, result_list)
+            min_next_r = search_v2_motif(seq, r-345, r, result_list, skip_trgf)

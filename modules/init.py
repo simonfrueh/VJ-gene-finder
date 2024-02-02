@@ -11,17 +11,28 @@ program_epilog = "https://github.com/simonfrueh/VJ-gene-finder"
 # Parse command line arguments
 def parse_arguments():
     # Initialize command line argument parser
-    parser = argparse.ArgumentParser(
-        prog=program_name,
-        description=program_description,
-        epilog=program_epilog)
+    p = argparse.ArgumentParser(prog=program_name,
+                                description=program_description,
+                                epilog=program_epilog)
 
     # Add and parse arguments
-    parser.add_argument("filename", help="Input file")
-    parser.add_argument("-v", "--version", action="version",
-                        version="%(prog)s "+program_version)
-    parser.add_argument("-o", "--output", help="Output directory")
-    args = parser.parse_args()
+    p.add_argument("filename", help="Input file")
+    p.add_argument("-v", "--version", action="version",
+                   version="%(prog)s "+program_version)
+    p.add_argument("-o", "--output", help="Output directory")
+    p.add_argument("-st",
+                   "--skip_trgf",
+                   action="store_true",
+                   help="Skip assignment of TR family name (based on amino "
+                   "acid motif) for V genes and use default names instead "
+                   "(TRV-SEL for V genes with single-exon leader peptide,"
+                   " TRV for V genes with two-exon leader peptide).")
+    p.add_argument("-ss",
+                   "--skip_selp",
+                   action="store_true",
+                   help="Skip search for V genes with single-exon leader "
+                   "peptide.")
+    args = p.parse_args()
 
     # Process Input filename (mandatory)
     print("Input file: %s" % args.filename)
@@ -42,4 +53,4 @@ def parse_arguments():
     if output_dir[-1] != "/":
         output_dir += "/"
 
-    return path, filename, output_dir
+    return path, filename, output_dir, args.skip_trgf, args.skip_selp
