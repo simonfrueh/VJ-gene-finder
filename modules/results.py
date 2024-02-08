@@ -9,9 +9,9 @@ from Bio.SeqRecord import SeqRecord
 def show_results(result_list):
     print("\nResults\n%i result(s) found" % len(result_list))
 
-    if len(result_list) > 0:
-        for n in result_list:
-            print(n)
+    # if len(result_list) > 0:
+    #     for n in result_list:
+    #         print(n)
 
 
 # Write results to output directory, directory will be created/overwritten
